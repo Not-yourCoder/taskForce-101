@@ -1,25 +1,74 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import FooterElement from "../FooterElement";
+import HeaderElement from "../HeaderElement";
+import Box from "@mui/material/Box";
+import { Stack, Pagination, CssBaseline } from "@mui/material";
 
 const Home = () => {
-  const navigate = useNavigate();
+  const url = "https://dev-api.mrcorporate.in/v1/company?%24limit=10&%24skip=0";
+  const [data, setData] = useState([]);
+  const [page, setPage] = useState(1);
+  const accessToken = localStorage.getItem("token");
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("tokenExpiration");
-    navigate("/login");
+  const fetchData = async () => {
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+      setData(result.data);
+      console.log(page);
+      console.log(result.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
-  setTimeout(() => {
-    logout();
-  }, 10000);
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
-    <div>
-      <h2>Logged in </h2>
-      <Button onClick={logout} variant="contained">
-        Log Out
-      </Button>
-    </div>
+    <Box fontFamily={"rubik"} minHeight={"100vh"}>
+      <HeaderElement />
+      {data.length > 0 && (
+        <div>
+          {data.slice(page * 1 - 1, page * 1).map((item) => (
+            <Box
+              key={data.id}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                m: "0 auto",
+                maxWidth: "30rem",
+              }}
+            >
+              <CssBaseline/>
+              <h1>{item.name}</h1>
+              <h4>{!item.about ? "no about" : item.about}</h4>
+              <p>{!item.description ? "no description" : item.description}</p>
+              <Stack spacing={4} sx={{ m: "0 auto" }}>
+                <Pagination
+                  count={data.length}
+                  onChange={handlePageChange}
+                  variant="rounded"
+                />
+              </Stack>
+            </Box>
+          ))}
+        </div>
+      )}
+    </Box>
   );
 };
 
