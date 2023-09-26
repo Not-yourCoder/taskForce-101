@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -13,14 +13,18 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-
+import MaterialUISwitch from "../components/muiSwitch";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Paper from '@mui/material/Paper';
 
 
 const HeaderElement = () => {
   const pages = ["Products", "Pricing", "Blog"];
   const settings = ["Profile", "Account", "Dashboard", "Logout"];
+
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [mode, setMode] = useState(false);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -38,13 +42,20 @@ const HeaderElement = () => {
   };
   const navigate = useNavigate();
 
+  const theme = createTheme({
+    palette: {
+      mode: mode ? "dark" : "light"
+    },
+  });
+
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("tokenExpiration");
     navigate("/login");
   };
   return (
-    <div>
+    <ThemeProvider theme = {theme}>
+      <Paper>
       <AppBar position="static">
         <Container maxWidth="xl">
           <Toolbar disableGutters>
@@ -62,6 +73,7 @@ const HeaderElement = () => {
                 letterSpacing: ".3rem",
                 color: "inherit",
                 textDecoration: "none",
+                
               }}
             >
               LOGO
@@ -140,6 +152,8 @@ const HeaderElement = () => {
                   <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
                 </IconButton>
               </Tooltip>
+              {/* <Switch {...label}  onClick={()=> setMode(!mode)}/> */}
+              <MaterialUISwitch sx={{ m: 1 }} onClick={() =>setMode(!mode)}/>
               <Menu
                 sx={{ mt: "45px" }}
                 id="menu-appbar"
@@ -158,11 +172,16 @@ const HeaderElement = () => {
               >
                 {settings.map((setting) => (
                   <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                    <Typography textAlign="center" onClick={()=>{
-                      if (setting === "Logout") {
-                        logout();
-                      }
-                    }}>{setting}</Typography>
+                    <Typography
+                      textAlign="center"
+                      onClick={() => {
+                        if (setting === "Logout") {
+                          logout();
+                        }
+                      }}
+                    >
+                      {setting}
+                    </Typography>
                   </MenuItem>
                 ))}
               </Menu>
@@ -170,8 +189,8 @@ const HeaderElement = () => {
           </Toolbar>
         </Container>
       </AppBar>
-      
-    </div>
+      </Paper>
+    </ThemeProvider>
   );
 };
 
