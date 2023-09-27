@@ -5,9 +5,7 @@ import Home from "./components/pages/Home";
 import PrivateRoutes from "./components/privateRoutes/PrivateRoutes";
 
 function App() {
-  setTimeout(() => {
-    localStorage.removeItem("token");
-  }, 20000);
+  
   return (
     <>
       <BrowserRouter>

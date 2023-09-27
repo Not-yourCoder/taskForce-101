@@ -67,7 +67,8 @@ const Home = (props) => {
         setRemainingTime(remainingTime - 1);
       } else {
         clearInterval(interval);
-        window.location.reload() // Stop the countdown when remainingTime reaches 0
+        window.location.reload()
+        localStorage.removeItem("token"); // Stop the countdown when remainingTime reaches 0
       }
     }, 1000); // Update the remaining time every second
 
@@ -78,7 +79,7 @@ const Home = (props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Root sx={{ maxWidth: "100%", width: 500, display: "flex", m: "0 auto" }}>
+      <Root sx={{ maxWidth: "100%", width: 600, display: "flex", m: "0 auto" }}>
         <Box
           fontFamily={"rubik"}
           sx={{
