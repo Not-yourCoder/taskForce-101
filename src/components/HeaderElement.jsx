@@ -16,7 +16,6 @@ import AdbIcon from "@mui/icons-material/Adb";
 import MaterialUISwitch from "../components/muiSwitch";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
-import TableData from "./TableData";
 
 const HeaderElement = () => {
   const pages = ["Products", "Pricing", "Blog"];
