@@ -162,7 +162,6 @@ const HeaderElement = () => {
                     />
                   </IconButton>
                 </Tooltip>
-                {/* <Switch {...label}  onClick={()=> setMode(!mode)}/> */}
                 <MaterialUISwitch
                   sx={{ m: 1 }}
                   onClick={() => setMode(!mode)}

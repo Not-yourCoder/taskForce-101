@@ -8,11 +8,7 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import {
-  createTheme,
-  
-  ThemeProvider,
-} from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -44,8 +40,6 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const expirationTimer = Date.now() + 5000 + 1000;
-  const currentTime = Date.now();
   const sendLoginData = async (email, password) => {
     try {
       const response = await axios.post(
@@ -58,10 +52,7 @@ export default function Login() {
       );
       if (response.data) {
         localStorage.setItem("token", response.data.accessToken);
-        localStorage.setItem("tokenExpiration", expirationTimer);
-        console.log("FirstName:", response.data.user.firstName);
         navigate("/");
-        <Home userDetails={response.data.user} />;
       } else {
         navigate("/login");
       }
@@ -86,6 +77,8 @@ export default function Login() {
       console.log("Fields cannot be empty");
     }
   };
+
+  
 
   return (
     <ThemeProvider theme={defaultTheme}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import HeaderElement from "../HeaderElement";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/system";
@@ -6,12 +6,16 @@ import {
   TablePagination,
   tablePaginationClasses as classes,
 } from "@mui/base/TablePagination";
+import { Typography, createTheme } from "@mui/material";
+import { ThemeProvider } from "@emotion/react";
 
-const Home = () => {
+const Home = (props) => {
   const url = "https://dev-api.mrcorporate.in/v1/company?%24limit=10&%24skip=0";
   const [data, setData] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [mode, setMode] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(16);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -27,6 +31,11 @@ const Home = () => {
   };
 
   const accessToken = localStorage.getItem("token");
+  const theme = createTheme({
+    palette: {
+      mode: mode ? "dark" : "light",
+    },
+  });
 
   const fetchData = async () => {
     try {
@@ -52,75 +61,95 @@ const Home = () => {
   useEffect(() => {
     fetchData();
   }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (remainingTime > 0) {
+        setRemainingTime(remainingTime - 1);
+      } else {
+        clearInterval(interval);
+        window.location.reload() // Stop the countdown when remainingTime reaches 0
+      }
+    }, 1000); // Update the remaining time every second
+
+    return () => {
+      clearInterval(interval); // Clean up the interval when the component unmounts
+    };
+  }, [remainingTime]);
 
   return (
-    <Root sx={{ maxWidth: "100%", width: 500 }}>
-      <Box
-        fontFamily={"rubik"}
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          flexDirection: "column",
-          bgcolor: "#b2ebf2",
-        }}
-      >
-        <HeaderElement />
-        <div style={{ maxWidth: "100%", width: 500 }}>
-          <table aria-label="custom pagination table">
-            <thead>
-              <tr>
-                <th>Company Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.length > 0 &&
-                data
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((item) => (
-                    <tr key={item.name}>
-                      <td>{item.name}</td>
-                      <td style={{ width: 160 }} align="right">
-                        {item.email}
-                      </td>
-                      <td style={{ width: 160 }} align="right">
-                        {item.phone}
-                      </td>
-                    </tr>
-                  ))}
-              {emptyRows > 0 && (
-                <tr style={{ height: 41 * emptyRows }}>
-                  <td colSpan={3} aria-hidden />
+    <ThemeProvider theme={theme}>
+      <Root sx={{ maxWidth: "100%", width: 500, display: "flex", m: "0 auto" }}>
+        <Box
+          fontFamily={"rubik"}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+          }}
+        >
+          <HeaderElement />
+          <div style={{ maxWidth: "100%", width: 500 }}>
+            <table aria-label="custom pagination table">
+              <thead>
+                <tr>
+                  <th>Company Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
                 </tr>
-              )}
-            </tbody>
-            <tfoot>
-              <tr>
-                <CustomTablePagination
-                  rowsPerPageOptions={[5, 10, { label: "All", value: -1 }]}
-                  colSpan={3}
-                  count={data.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  slotProps={{
-                    select: {
-                      "aria-label": "rows per page",
-                    },
-                    actions: {
-                      showFirstButton: true,
-                      showLastButton: true,
-                    },
-                  }}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </Box>
-    </Root>
+              </thead>
+              <tbody>
+                {data.length > 0 &&
+                  data
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((item) => (
+                      <tr key={item.name}>
+                        <td>{item.name}</td>
+                        <td style={{ width: 160 }} align="right">
+                          {item.email}
+                        </td>
+                        <td style={{ width: 160 }} align="right">
+                          {item.phone}
+                        </td>
+                      </tr>
+                    ))}
+                {emptyRows > 0 && (
+                  <tr style={{ height: 41 * emptyRows }}>
+                    <td colSpan={3} aria-hidden />
+                  </tr>
+                )}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <CustomTablePagination
+                    rowsPerPageOptions={[
+                      5,
+                      10,
+                      { label: "All", value: data.length },
+                    ]}
+                    colSpan={3}
+                    count={data.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    slotProps={{
+                      select: {
+                        "aria-label": "rows per page",
+                      },
+                      actions: {
+                        showFirstButton: true,
+                        showLastButton: true,
+                      },
+                    }}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </Box>
+      </Root>
+      <Typography sx={{ display:"flex", m: "0 auto", justifyContent:"center"}}>Token gets deleted after {remainingTime} secs.</Typography>
+    </ThemeProvider>
   );
 };
 
@@ -184,8 +213,7 @@ const Root = styled("div")(
   `
 );
 const grey = {
-  200: '#d0d7de',
-  800: '#32383f',
-  900: '#24292f',
+  200: "#90a4ae",
+  800: "#37474f",
+  900: "#263238",
 };
-
