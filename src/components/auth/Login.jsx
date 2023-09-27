@@ -10,7 +10,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import {
   createTheme,
-  responsiveFontSizes,
+  
   ThemeProvider,
 } from "@mui/material/styles";
 import axios from "axios";
